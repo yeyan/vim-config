@@ -3,10 +3,12 @@
 " Version: 1.1
 " Author: ye yan 
 " Created: May-05-2010
-" Last Change:  Fri Dec 12 09:12:17 ACDT 2014
+" Last Change:  Wed Jul  1 14:39:15 ACST 2015
 
 " **********************************************************************
 " essential configurations
+
+" set spell spelllang=en_us
 
 " initialize pathogen and load modules
 execute pathogen#infect()
@@ -160,6 +162,18 @@ au BufNewFile,BufRead *.html.ftl setf html.ftl
 " https://github.com/Chiel92/vim-autoformat
 noremap <leader>b :Autoformat<CR><CR>
 
+" tidy parameter for xhtml (the default parameter would produce a blank
+" buffer if there is an unkown tag)
+let g:formatprg_args_expr_xhtml = '"--input-xml 1 --indent 1 --indent-spaces ".&shiftwidth." --quiet 1 --indent-attributes 1 --vertical-space yes --tidy-mark no"'
+let g:formatprg_args_expr_xml = '"-q -xml --show-errors 0 --show-warnings 0 --force-output --indent auto --indent-attributes 1 --indent-spaces ".&shiftwidth." --vertical-space yes --tidy-mark no -wrap ".&textwidth'
+let g:formatprg_args_expr_cpp = '"--mode=c -N -xC120 --style=ansi -pcH".(&expandtab ? "s".&shiftwidth : "t")'
+
 " TagBar
 "  https://github.com/majutsushi/tagbar
 nmap <F8> :TagbarToggle<CR>
+nnoremap <F5> "=strftime("%F %T")<CR>P
+nnoremap <F12> :setlocal spell! spelllang=en_us<CR>
+
+
+" ************************************************************************
+" CScope configurations
