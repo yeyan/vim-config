@@ -111,8 +111,8 @@ set lazyredraw
 " Moving around, tabs, windows and buffers
 
 " Treat long lines as break lines (useful when moving around in them)
-map j gj
-map k gk
+" map j gj
+" map k gk
 
 " Smart way to move between windows
 map <C-j> <C-W>j
@@ -174,6 +174,9 @@ nmap <F8> :TagbarToggle<CR>
 nnoremap <F5> "=strftime("%F %T")<CR>P
 nnoremap <F12> :setlocal spell! spelllang=en_us<CR>
 
+function! FormatHaskell()
+    execute "!" . "hindent" . " --style cramer " . bufname("%")
+    edit!
+endfunction
 
-" ************************************************************************
-" CScope configurations
+autocmd FileType haskell map <buffer> <localleader>b :call FormatHaskell()<cr><cr>
