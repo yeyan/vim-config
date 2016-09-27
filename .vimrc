@@ -3,7 +3,7 @@
 " Version: 1.1
 " Author: ye yan 
 " Created: May-05-2010
-" Last Change:  Wed Jul  1 14:39:15 ACST 2015
+" Last Change:  Tue  9 Aug 2016 10:40:50 AEST
 
 " **********************************************************************
 " essential configurations
@@ -48,6 +48,11 @@ if has("gui_running")
         set guifont=DejaVu\ Sans\ Mono\ 14
         "set backupdir=~/.vim/temp/backup,.
         "set directory=~/.vim/temp/swap,.
+    endif
+
+    "On OSX set the font to Monaco
+    if has("gui_macvim")
+        set guifont=Monaco:h16
     endif
 
     " use color scheme molokai, requires plugin
