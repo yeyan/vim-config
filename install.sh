@@ -7,7 +7,47 @@ if ! type "git" > /dev/null; then
     exit 1
 fi
 
-VIM_HOME=~/.vim
+# Install .vimrc
+
+if [ -f "$HOME/.vimrc" ]
+then
+    while true
+    do
+        read -p "Do you want to override your .vimrc file? " yn
+        case $yn in
+            [Yy]* ) 
+                echo "Overriding .vimrc"
+                cp ./vimrc ~/.vimrc
+                break;;
+            [Nn]* ) 
+                echo ".vimrc is NOT overrided"
+                exit;;
+        esac
+    done
+else
+    echo "Installing .vimrc"
+    cp ./vimrc ~/.vimrc
+fi
+
+# Install .vim directory
+
+VIM_HOME=$HOME/.vim
+
+if [ -d "$VIM_HOME" ]
+then
+    while true
+    do
+        read -p "Do you want to override your .vim directory? " yn
+        case $yn in
+            [Yy]* ) 
+                echo "Installing addons"
+                break;;
+            [Nn]* ) 
+                echo "Addons will not be installed."
+                exit;;
+        esac
+    done
+fi
 
 rm -rf $VIM_HOME
 
@@ -47,18 +87,15 @@ declare -a repos=(
 
 # Clone all add-ons into bundle
 
-echo "Cloning addon repositories"
-
 cd $VIM_HOME/bundle
 for repo in "${repos[@]}"
 do
+    echo "Installing $repo"
     git clone --depth 1 --quiet $repo > /dev/null
 done
 cd -
 
 # Compile vimproc
-
-echo "Compiling vimproc"
 
 cd $VIM_HOME/bundle/vimproc.vim
 make
