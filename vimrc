@@ -3,10 +3,10 @@
 " Version: 1.1
 " Author: ye yan 
 " Created: May-05-2010
-" Last Change:  Tue  9 Aug 2016 10:40:50 AEST
+" Last Change: 2017-09-25 13:00:07 
 
 " **********************************************************************
-" essential configurations
+" Basic configurations
 
 " set spell spelllang=en_us
 
@@ -26,7 +26,7 @@ set nocompatible
 " set ignorecase
 
 " ********************************************************************** 
-" gui configurations
+" GUI configurations
 
 if has("gui_running")
     " highlight searchings
@@ -37,8 +37,6 @@ if has("gui_running")
     "On windows set font to courier
     if has("gui_win32")
         set guifont=Courier\ New:h14:b
-        "set backupdir=~/.vimtemp/backup,~/vimbackups
-        "set directory=~/.vimtemp/swap,.
     endif 
     " set default font
     "set guifont=monaco:h16
@@ -46,8 +44,6 @@ if has("gui_running")
     "On Linux set font to monospace
     if has("gui_gtk")
         set guifont=DejaVu\ Sans\ Mono\ 14
-        "set backupdir=~/.vim/temp/backup,.
-        "set directory=~/.vim/temp/swap,.
     endif
 
     "On OSX set the font to Monaco
@@ -70,7 +66,7 @@ set nowb
 set noswapfile
 
 " ************************************************************************
-" editing parameter configurations
+" Editing parameter configurations
 
 " show the cursor position all the time
 set ruler
@@ -79,7 +75,7 @@ set ruler
 set foldenable
 
 " uncomment next line to show line numbers
-"set number
+set number
 
 " allow backspacing over everything in insert mode
 set backspace=indent,eol,start
@@ -116,18 +112,21 @@ set lazyredraw
 " Moving around, tabs, windows and buffers
 
 " Treat long lines as break lines (useful when moving around in them)
+" PS (make it hard for you to go to certain point of a long line)
 " map j gj
 " map k gk
 
 " Smart way to move between windows
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
+" Not so sure I want this
+" map <C-j> <C-W>j
+" map <C-k> <C-W>k
+" map <C-h> <C-W>h
+" map <C-l> <C-W>l
 
 " **********************************************************************
-" self defined functions
+" Programming language or add-on specific configuration
 
+" Programming mode
 let g:editing_mode=0
 
 function! ProgrammingModeToggle()
@@ -143,28 +142,21 @@ function! ProgrammingModeToggle()
   let g:editing_mode=(g:editing_mode+1)%2
 endfunction
 
-" ************************************************************************ 
-" key mappings
 nnoremap <leader>f :call ProgrammingModeToggle()<cr>
 
-" shortcuts for copy and paste to system clipboard
+" Shortcuts for copy and paste to system clipboard
 vnoremap <C-insert> "+y
 nnoremap <S-insert> "+p
 inoremap <S-insert> <ESC>"+pa
 
-" ************************************************************************ 
-" abbreviations
-
-" ************************************************************************
 " Gradle && Groovy setup
+
 au BufNewFile,BufRead *.gradle setf groovy
 au BufNewFile,BufRead *.html.ftl setf html.ftl
 
-" ************************************************************************
-" Addon configurations
-
 " Autoformat
 " https://github.com/Chiel92/vim-autoformat
+
 noremap <leader>b :Autoformat<CR><CR>
 
 " tidy parameter for xhtml (the default parameter would produce a blank
@@ -173,15 +165,48 @@ let g:formatprg_args_expr_xhtml = '"--input-xml 1 --indent 1 --indent-spaces ".&
 let g:formatprg_args_expr_xml = '"-q -xml --show-errors 0 --show-warnings 0 --force-output --indent auto --indent-attributes 1 --indent-spaces ".&shiftwidth." --vertical-space yes --tidy-mark no -wrap ".&textwidth'
 let g:formatprg_args_expr_cpp = '"--mode=c -N -xC120 --style=ansi -pcH".(&expandtab ? "s".&shiftwidth : "t")'
 
-" TagBar
-"  https://github.com/majutsushi/tagbar
-nmap <F8> :TagbarToggle<CR>
-nnoremap <F5> "=strftime("%F %T")<CR>P
-nnoremap <F12> :setlocal spell! spelllang=en_us<CR>
-
+" Haskell
 function! FormatHaskell()
     execute "!" . "hindent" . " --style cramer " . bufname("%")
     edit!
 endfunction
 
 autocmd FileType haskell map <buffer> <localleader>b :call FormatHaskell()<cr><cr>
+
+" TagBar
+" https://github.com/majutsushi/tagbar
+
+nmap <F8> :TagbarToggle<CR>
+
+" Time stamp
+nnoremap <F5> "=strftime("%F %T")<CR>P
+
+" Enable spell checking
+nnoremap <F12> :setlocal spell! spelllang=en_us<CR>
+
+" Syntastic
+" https://github.com/vim-syntastic/syntastic
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+
+let g:syntastic_mode_map = {
+    \ "mode": "active",
+    \ "passive_filetypes": ["java", "html"] }
+
+" Live down 
+" github: https://github.com/shime/vim-livedown
+
+nmap <C-p> :LivedownToggle<CR>
+
+" Octave setup
+autocmd BufRead,BufNewFile *.m set filetype=octave
+
+" VimShell
+" https://github.com/Shougo/vimshell.vim
+let g:vimshell_editor_command="/usr/local/bin/mvim"
