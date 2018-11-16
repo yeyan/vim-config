@@ -2,8 +2,7 @@
 
 # Ye's VIM configuration
 
-
-### Install/update add-ons
+### Install VIM Configurations
 
 ```bash
 ./install.sh

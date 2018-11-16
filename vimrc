@@ -1,17 +1,22 @@
 " **********************************************************************
 " File: .gvimrc             
-" Version: 1.1
-" Author: ye yan 
+" Version: 1.2
+" Author: Ye Yan 
 " Created: May-05-2010
-" Last Change: 2017-09-25 13:00:07 
+"
+" Change History:
+"   2018-08-21 12:21:56
+"       -- use Plug instead of parthenon for plugin managment
+"       -- use neovim/neomake for make and lint
+"   2018-11-16 14:21:48 
+"       -- remove unused plugin "dodgelang"
+"       -- correct key binding
+"       -- clean up legacy section
 
 " **********************************************************************
 " Basic configurations
 
 " set spell spelllang=en_us
-
-" initialize pathogen and load modules
-execute pathogen#infect()
 
 " allow syntax highlighting
 syntax on
@@ -116,17 +121,41 @@ set lazyredraw
 " map j gj
 " map k gk
 
-" Smart way to move between windows
-" Not so sure I want this
-" map <C-j> <C-W>j
-" map <C-k> <C-W>k
-" map <C-h> <C-W>h
-" map <C-l> <C-W>l
+" **********************************************************************
+" load plugins 
+
+call plug#begin()
+
+" On-demand loading
+Plug 'scrooloose/nerdtree', { 'on':  'NERDTreeToggle' }
+Plug 'Vimjas/vim-python-pep8-indent', { 'for': 'python' }
+
+" Noemake for async linting and make
+Plug 'neomake/neomake'
+
+" Python support
+Plug 'vim-python/python-syntax'
+
+" Autoformat
+Plug 'Chiel92/vim-autoformat'
+
+" Markdown preview with mathemtical formula support
+Plug 'iamcco/mathjax-support-for-mkdp'
+Plug 'iamcco/markdown-preview.vim'
+
+Plug 'posva/vim-vue'
+
+call plug#end()
 
 " **********************************************************************
-" Programming language or add-on specific configuration
+" Configure plugins 
 
-" Programming mode
+" Only do make when writing the buffer
+if exists('neomake')
+    call neomake#configure#automake('w')
+endif
+
+" NerdTree
 let g:editing_mode=0
 
 function! ProgrammingModeToggle()
@@ -142,28 +171,46 @@ function! ProgrammingModeToggle()
   let g:editing_mode=(g:editing_mode+1)%2
 endfunction
 
+let NERDTreeIgnore=['\.pyc$[[file]]']
+
+" Autoformat
+" tidy parameter for xhtml (the default parameter would produce a blank buffer if there is an unkown tag)
+let g:formatprg_args_expr_xhtml = '"--input-xml 1 --indent 1 --indent-spaces ".&shiftwidth." --quiet 1 --indent-attributes 1 --vertical-space yes --tidy-mark no"'
+let g:formatprg_args_expr_xml = '"-q -xml --show-errors 0 --show-warnings 0 --force-output --indent auto --indent-attributes 1 --indent-spaces ".&shiftwidth." --vertical-space yes --tidy-mark no -wrap ".&textwidth'
+let g:formatprg_args_expr_cpp = '"--mode=c -N -xC120 --style=ansi -pcH".(&expandtab ? "s".&shiftwidth : "t")'
+
+" **********************************************************************
+" Keybindings
+
+" Make moving around a bit easier
+map <C-j> <C-W>j
+map <C-k> <C-W>k
+map <C-h> <C-W>h
+map <C-l> <C-W>l
+
+" Programming mode
 nnoremap <leader>f :call ProgrammingModeToggle()<cr>
+
+" Autoformat
+noremap <leader>b :Autoformat<CR><CR>
+
+" Time stamp
+nnoremap <F5> "=strftime("%F %T")<CR>P
+
+" Enable spell checking
+nnoremap <F6> :setlocal spell! spelllang=en_us<CR>
+
+" Turnon markdown preview
+nnoremap <F3> :MarkdownPreview<CR>
 
 " Shortcuts for copy and paste to system clipboard
 vnoremap <C-insert> "+y
 nnoremap <S-insert> "+p
 inoremap <S-insert> <ESC>"+pa
 
-" Gradle && Groovy setup
 
-au BufNewFile,BufRead *.gradle setf groovy
-au BufNewFile,BufRead *.html.ftl setf html.ftl
-
-" Autoformat
-" https://github.com/Chiel92/vim-autoformat
-
-noremap <leader>b :Autoformat<CR><CR>
-
-" tidy parameter for xhtml (the default parameter would produce a blank
-" buffer if there is an unkown tag)
-let g:formatprg_args_expr_xhtml = '"--input-xml 1 --indent 1 --indent-spaces ".&shiftwidth." --quiet 1 --indent-attributes 1 --vertical-space yes --tidy-mark no"'
-let g:formatprg_args_expr_xml = '"-q -xml --show-errors 0 --show-warnings 0 --force-output --indent auto --indent-attributes 1 --indent-spaces ".&shiftwidth." --vertical-space yes --tidy-mark no -wrap ".&textwidth'
-let g:formatprg_args_expr_cpp = '"--mode=c -N -xC120 --style=ansi -pcH".(&expandtab ? "s".&shiftwidth : "t")'
+" **********************************************************************
+" File based and plug based configurations
 
 " Haskell
 function! FormatHaskell()
@@ -173,40 +220,35 @@ endfunction
 
 autocmd FileType haskell map <buffer> <localleader>b :call FormatHaskell()<cr><cr>
 
-" TagBar
-" https://github.com/majutsushi/tagbar
+" Vue (Javascript Framework)
+" Prevent random syntax highlight problem
+autocmd FileType vue syntax sync fromstart
+autocmd FileType vue setlocal indentkeys-=*<Return> indentkeys-={
 
-nmap <F8> :TagbarToggle<CR>
-
-" Time stamp
-nnoremap <F5> "=strftime("%F %T")<CR>P
-
-" Enable spell checking
-nnoremap <F12> :setlocal spell! spelllang=en_us<CR>
-
-" Syntastic
-" https://github.com/vim-syntastic/syntastic
-set statusline+=%#warningmsg#
-set statusline+=%{SyntasticStatuslineFlag()}
-set statusline+=%*
-
-let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_auto_loc_list = 1
-let g:syntastic_check_on_open = 1
-let g:syntastic_check_on_wq = 0
-
-let g:syntastic_mode_map = {
-    \ "mode": "active",
-    \ "passive_filetypes": ["java", "html"] }
-
-" Live down 
-" github: https://github.com/shime/vim-livedown
-
-nmap <C-p> :LivedownToggle<CR>
+" Automatically remove trailing white space
+" Very usefull when copying code from jupyter notebook
+autocmd BufWritePre *.py :%s/\s\+$//e
 
 " Octave setup
 autocmd BufRead,BufNewFile *.m set filetype=octave
 
-" VimShell
-" https://github.com/Shougo/vimshell.vim
-let g:vimshell_editor_command="/usr/local/bin/mvim"
+" Python Syntax
+let g:python_highlight_all = 1
+
+" Gradle && Groovy setup
+au BufNewFile,BufRead *.gradle setf groovy
+au BufNewFile,BufRead *.html.ftl setf html.ftl
+
+
+" **********************************************************************
+" No longer used 
+
+" No long used, only keep for reference.
+" Live down 
+" github: https://github.com/shime/vim-livedown
+" nmap <C-p> :LivedownToggle<CR>
+
+" Vim Yaml Formatter
+" https://github.com/tarekbecker/vim-yaml-formatter
+" autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
+" autocmd FileType yaml map <buffer> <localleader>b :call YAMLFormat()<cr><cr>
