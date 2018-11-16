@@ -2,7 +2,7 @@
 
 # Ye's VIM configuration
 
-### Install VIM Configurations
+### Install VIM Configurations (UNIX Only)
 
 ```bash
 ./install.sh
