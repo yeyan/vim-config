@@ -140,12 +140,16 @@ Plug 'vim-python/python-syntax'
 Plug 'Chiel92/vim-autoformat'
 
 " Markdown preview with mathemtical formula support
-Plug 'iamcco/mathjax-support-for-mkdp'
-Plug 'iamcco/markdown-preview.vim'
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'}
 
+" Vue support
 Plug 'posva/vim-vue'
 
+" Julia language support
 Plug 'JuliaEditorSupport/julia-vim'
+
+" Ack support
+Plug 'mileszs/ack.vim'
 
 call plug#end()
 

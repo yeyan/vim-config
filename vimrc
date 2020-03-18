@@ -3,6 +3,7 @@
 " Version: 1.2
 " Author: Ye Yan 
 " Created: May-05-2010
+" Last-Updated: 2019-04-12 09:10:27 
 "
 " Change History:
 "   2018-08-21 12:21:56
@@ -33,9 +34,11 @@ set nocompatible
 " ********************************************************************** 
 " GUI configurations
 
-if has("gui_running")
+function! s:ConfigGuiVim()
+
     " highlight searchings
     set hlsearch
+
     " incremental searchings
     set incsearch
 
@@ -43,8 +46,6 @@ if has("gui_running")
     if has("gui_win32")
         set guifont=Courier\ New:h14:b
     endif 
-    " set default font
-    "set guifont=monaco:h16
     
     "On Linux set font to monospace
     if has("gui_gtk")
@@ -61,6 +62,43 @@ if has("gui_running")
 
     " set vim size (based on lines and columns)
     set lines=30 columns=80
+
+    " Custom layout
+    let g:editing_mode=0
+
+    function! ProgrammingModeToggle()
+        if g:editing_mode == 0
+            NERDTree
+            set lines=999 columns=999
+        else
+            NERDTreeClose
+            set lines=30 columns=80
+        endif
+        let g:editing_mode=(g:editing_mode+1)%2
+    endfunction
+
+    let NERDTreeIgnore=['\.pyc$[[file]]']
+
+    " Key bindings
+    tnoremap <ESC> <C-W><S-N>
+
+    tnoremap <C-j> <C-W>j
+    tnoremap <C-k> <C-W>k
+    tnoremap <C-h> <C-W>h
+    tnoremap <C-l> <C-W>l
+
+    map <C-j> <C-W>j
+    map <C-k> <C-W>k
+    map <C-h> <C-W>h
+    map <C-l> <C-W>l
+
+    " Programming mode
+    nnoremap <leader>f :call ProgrammingModeToggle()<cr>
+
+endfunction
+
+if has("gui_running")
+    autocmd VIMEnter * :call s:ConfigGuiVim()
 endif
 
 " ********************************************************************** 
@@ -140,38 +178,38 @@ Plug 'vim-python/python-syntax'
 Plug 'Chiel92/vim-autoformat'
 
 " Markdown preview with mathemtical formula support
-Plug 'iamcco/mathjax-support-for-mkdp'
-Plug 'iamcco/markdown-preview.vim'
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'}
 
+" Vue support
 Plug 'posva/vim-vue'
+
+" Julia language support
+Plug 'JuliaEditorSupport/julia-vim'
+
+" Ack support
+Plug 'mileszs/ack.vim'
+
+" Cassandra CQL support
+Plug 'elubow/cql-vim'
+
+" Octave
+Plug 'jvirtanen/vim-octave'
+
+" Tabular
+" Plug 'godlygeek/tabular'
+
+" Ale
+Plug 'dense-analysis/ale'
 
 call plug#end()
 
 " **********************************************************************
-" Configure plugins 
+" Plugins configuration
 
 " Only do make when writing the buffer
 if exists('neomake')
     call neomake#configure#automake('w')
 endif
-
-" NerdTree
-let g:editing_mode=0
-
-function! ProgrammingModeToggle()
-  if(has("gui_running"))
-    if g:editing_mode == 0
-      NERDTree
-      set lines=999 columns=999
-    else
-      NERDTreeClose
-      set lines=30 columns=80
-    endif
-  endif
-  let g:editing_mode=(g:editing_mode+1)%2
-endfunction
-
-let NERDTreeIgnore=['\.pyc$[[file]]']
 
 " Autoformat
 " tidy parameter for xhtml (the default parameter would produce a blank buffer if there is an unkown tag)
@@ -179,38 +217,41 @@ let g:formatprg_args_expr_xhtml = '"--input-xml 1 --indent 1 --indent-spaces ".&
 let g:formatprg_args_expr_xml = '"-q -xml --show-errors 0 --show-warnings 0 --force-output --indent auto --indent-attributes 1 --indent-spaces ".&shiftwidth." --vertical-space yes --tidy-mark no -wrap ".&textwidth'
 let g:formatprg_args_expr_cpp = '"--mode=c -N -xC120 --style=ansi -pcH".(&expandtab ? "s".&shiftwidth : "t")'
 
+" Ale
+
+nmap <silent> ]w <Plug>(ale_next_wrap)
+nmap <silent> [w <Plug>(ale_previous_wrap)
+
+let g:ale_fixers = {
+\   '*': ['remove_trailing_lines', 'trim_whitespace'],
+\   'python': ['autopep8']
+\}
+
+let g:ale_linters = {
+\   'python': ['flake8'],
+\}
+
+let g:ale_fix_on_save = 1
+
 " **********************************************************************
 " Keybindings
-
-" Make moving around a bit easier
-map <C-j> <C-W>j
-map <C-k> <C-W>k
-map <C-h> <C-W>h
-map <C-l> <C-W>l
-
-" Programming mode
-nnoremap <leader>f :call ProgrammingModeToggle()<cr>
 
 " Autoformat
 noremap <leader>b :Autoformat<CR><CR>
 
+" Markdown preview
+nnoremap <F3> :MarkdownPreview<CR>
+
 " Time stamp
 nnoremap <F5> "=strftime("%F %T")<CR>P
-
-" Enable spell checking
-nnoremap <F6> :setlocal spell! spelllang=en_us<CR>
-
-" Turnon markdown preview
-nnoremap <F3> :MarkdownPreview<CR>
 
 " Shortcuts for copy and paste to system clipboard
 vnoremap <C-insert> "+y
 nnoremap <S-insert> "+p
 inoremap <S-insert> <ESC>"+pa
 
-
 " **********************************************************************
-" File based and plug based configurations
+" File based configurations
 
 " Haskell
 function! FormatHaskell()
@@ -239,6 +280,9 @@ let g:python_highlight_all = 1
 au BufNewFile,BufRead *.gradle setf groovy
 au BufNewFile,BufRead *.html.ftl setf html.ftl
 
+" Octave/Matlab setup
+autocmd FileType octave syntax sync fromstart
+autocmd FileType octave setlocal ts=2 sts=2 sw=2 expandtab
 
 " **********************************************************************
 " No longer used 
@@ -252,3 +296,5 @@ au BufNewFile,BufRead *.html.ftl setf html.ftl
 " https://github.com/tarekbecker/vim-yaml-formatter
 " autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 " autocmd FileType yaml map <buffer> <localleader>b :call YAMLFormat()<cr><cr>
+"
+"
