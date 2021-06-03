@@ -1,15 +1,15 @@
 " **********************************************************************
-" File: .gvimrc             
+" File: .gvimrc
 " Version: 1.2
-" Author: Ye Yan 
+" Author: Ye Yan
 " Created: May-05-2010
-" Last-Updated: 2019-04-12 09:10:27 
+" Last-Updated: 2019-04-12 09:10:27
 "
 " Change History:
 "   2018-08-21 12:21:56
 "       -- use Plug instead of parthenon for plugin managment
 "       -- use neovim/neomake for make and lint
-"   2018-11-16 14:21:48 
+"   2018-11-16 14:21:48
 "       -- remove unused plugin "dodgelang"
 "       -- correct key binding
 "       -- clean up legacy section
@@ -31,7 +31,7 @@ set nocompatible
 " by default ignorecase when search
 " set ignorecase
 
-" ********************************************************************** 
+" **********************************************************************
 " GUI configurations
 
 function! s:ConfigGuiVim()
@@ -45,8 +45,8 @@ function! s:ConfigGuiVim()
     "On windows set font to courier
     if has("gui_win32")
         set guifont=Courier\ New:h14:b
-    endif 
-    
+    endif
+
     "On Linux set font to monospace
     if has("gui_gtk")
         set guifont=DejaVu\ Sans\ Mono\ 14
@@ -101,7 +101,7 @@ if has("gui_running")
     autocmd VIMEnter * :call s:ConfigGuiVim()
 endif
 
-" ********************************************************************** 
+" **********************************************************************
 " Files, backups and undo
 
 set nobackup
@@ -160,7 +160,7 @@ set lazyredraw
 " map k gk
 
 " **********************************************************************
-" load plugins 
+" load plugins
 
 call plug#begin()
 
@@ -178,7 +178,7 @@ Plug 'vim-python/python-syntax'
 Plug 'Chiel92/vim-autoformat'
 
 " Markdown preview with mathemtical formula support
-Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install'}
+Plug 'iamcco/markdown-preview.nvim', { 'do': { -> mkdp#util#install() }, 'for': ['markdown', 'vim-plug']}
 
 " Vue support
 Plug 'posva/vim-vue'
@@ -200,6 +200,12 @@ Plug 'jvirtanen/vim-octave'
 
 " Ale
 Plug 'dense-analysis/ale'
+
+" Scala
+Plug 'derekwyatt/vim-scala'
+
+" Ack
+Plug 'mileszs/ack.vim'
 
 call plug#end()
 
@@ -224,11 +230,15 @@ nmap <silent> [w <Plug>(ale_previous_wrap)
 
 let g:ale_fixers = {
 \   '*': ['remove_trailing_lines', 'trim_whitespace'],
-\   'python': ['autopep8']
+\   'python': ['black'],
+\   'typescript': ['deno'],
+\   'json': ['prettier'],
+\   'javascript': ['prettier']
 \}
 
 let g:ale_linters = {
 \   'python': ['flake8'],
+\   'typescript': ['deno']
 \}
 
 let g:ale_fix_on_save = 1
@@ -285,10 +295,10 @@ autocmd FileType octave syntax sync fromstart
 autocmd FileType octave setlocal ts=2 sts=2 sw=2 expandtab
 
 " **********************************************************************
-" No longer used 
+" No longer used
 
 " No long used, only keep for reference.
-" Live down 
+" Live down
 " github: https://github.com/shime/vim-livedown
 " nmap <C-p> :LivedownToggle<CR>
 
