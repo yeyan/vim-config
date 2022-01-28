@@ -59,8 +59,5 @@ mkdir -p $VIM_HOME/colors
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 
-# Install theme
-cp jellybeans.vim $VIM_HOME/colors/
-
 # Install Plugins Using Plug
 vim '+PlugInstall' '+qa!'
