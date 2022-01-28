@@ -207,6 +207,9 @@ Plug 'derekwyatt/vim-scala'
 " Ack
 Plug 'mileszs/ack.vim'
 
+" Jellybean theme
+Plug 'nanotech/jellybeans.vim'
+
 call plug#end()
 
 " **********************************************************************
